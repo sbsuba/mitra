@@ -7,7 +7,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
-from app.agent import should_escalate_crisis, get_crisis_resources
+from app.core import should_escalate_crisis, get_crisis_resources
 from app.config import DISCLAIMER
 
 

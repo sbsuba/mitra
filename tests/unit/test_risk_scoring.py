@@ -7,7 +7,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import pytest
-from app.agent import calculate_risk_score, get_risk_level, should_escalate_crisis
+from app.core import calculate_risk_score, get_risk_level, should_escalate_crisis
 
 
 class TestRiskScoring:
