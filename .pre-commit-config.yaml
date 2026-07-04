@@ -1,0 +1,18 @@
+repos:
+  - repo: local
+    hooks:
+      - id: end-of-file-fixer
+        name: End of File Fixer
+        entry: end-of-file-fixer
+        language: system
+        types: [file]
+      - id: trailing-whitespace
+        name: Trailing Whitespace
+        entry: trailing-whitespace-fixer
+        language: system
+        types: [file]
+      - id: semgrep
+        name: Semgrep Security Scan
+        entry: semgrep --error --config mitra/.semgrep/rules.yaml
+        language: system
+        types: [python]

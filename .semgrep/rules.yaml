@@ -1,0 +1,12 @@
+rules:
+  - id: detect-hardcoded-google-api-key
+    pattern-regex: 'AIzaSy[A-Za-z0-9_\-]*'
+    message: "Security: Hardcoded Google API key detected. Use .env instead."
+    languages: [python]
+    severity: ERROR
+
+  - id: detect-user-data-in-logs
+    pattern: 'logging.$LOG($X + $USER + $Y)'
+    message: "Security: Possible user mental health data in logs."
+    languages: [python]
+    severity: ERROR
