@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "signal-store": {
+      "command": "python3",
+      "args": ["mcp_servers/signal_store.py"],
+      "transport": "stdio",
+      "description": "Stores and retrieves 30-day check-in history per user"
+    },
+    "who-resources": {
+      "command": "python3",
+      "args": ["mcp_servers/who_resources.py"],
+      "transport": "stdio",
+      "description": "Global WHO crisis lines by country and language"
+    },
+    "google-developer-knowledge": {
+      "headers": {
+        "X-Goog-Api-Key": "${GOOGLE_API_KEY}"
+      },
+      "serverUrl": "https://developerknowledge.googleapis.com/mcp"
+    }
+  }
+}

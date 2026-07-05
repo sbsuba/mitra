@@ -59,3 +59,70 @@ def get_crisis_resources(country="US", language="en"):
     }
     resources = crisis_lines.get(country, crisis_lines["DEFAULT"])
     return {**resources, "language": language, "disclaimer": DISCLAIMER}
+def store_checkin_result(state: dict) -> dict:
+    """
+    Prepares check-in result for MCP signal store.
+    Called after risk scoring completes.
+    Enables 7-day longitudinal pattern detection.
+
+    Args:
+        state: State dict with user_id, signals, risk_score, risk_level.
+
+    Returns:
+        State with stored=True flag.
+    """
+    from datetime import date
+    result = {
+        "user_id": state.get("user_id", "anonymous"),
+        "date": str(date.today()),
+        "sleep": state.get("signals", {}).get("sleep"),
+        "energy": state.get("signals", {}).get("energy"),
+        "social": state.get("signals", {}).get("social"),
+        "mood": state.get("signals", {}).get("mood"),
+        "risk_score": state.get("risk_score", 0),
+        "risk_level": state.get("risk_level", "unknown")
+    }
+    # In production: call signal_store MCP server
+    # mcp_client.call_tool("store_checkin", result)
+    return {**state, "stored": True, "stored_result": result}
+
+
+def get_longitudinal_trend(history: list) -> dict:
+    """
+    Analyses 7-day check-in history to detect pattern shifts.
+    This is Mitra's core differentiator — pattern not snapshot.
+
+    Args:
+        history: List of daily check-in dicts with risk_score.
+
+    Returns:
+        Dict with trend direction, average, and insight text.
+    """
+    if not history:
+        return {"trend": "no_data", "average": 0, "insight": ""}
+
+    scores = [h.get("risk_score", 0) for h in history[-7:]]
+    avg = sum(scores) / len(scores)
+
+    if len(scores) >= 3:
+        recent = sum(scores[-3:]) / 3
+        earlier = sum(scores[:3]) / 3
+        if recent < earlier - 10:
+            trend = "improving"
+            insight = f"Your average risk score has dropped from {int(earlier)} to {int(recent)} over the last week. That is real progress."
+        elif recent > earlier + 10:
+            trend = "deteriorating"
+            insight = f"Mitra has noticed your scores rising over the last week — from {int(earlier)} to {int(recent)}. This pattern is worth addressing today."
+        else:
+            trend = "stable"
+            insight = f"Your patterns have been relatively stable this week, averaging {int(avg)}."
+    else:
+        trend = "insufficient_data"
+        insight = "Keep checking in — Mitra needs 7 days to detect patterns."
+
+    return {
+        "trend": trend,
+        "average": round(avg, 1),
+        "scores": scores,
+        "insight": insight
+    }
