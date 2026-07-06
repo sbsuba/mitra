@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mitra — The friend who notices</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:#1a1a2e;--ink-soft:#4a4a6a;--ink-muted:#8888aa;
+      --paper:#faf9f7;--warm:#f5f0e8;--accent:#5b6af5;
+      --accent-lt:#eef0ff;--success:#2d9e6b;--success-lt:#e8f7f0;
+      --warn:#d97d2a;--warn-lt:#fef3e2;--danger:#c94040;
+      --danger-lt:#fdeaea;--border:rgba(26,26,46,0.10);--radius:14px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+    .app{max-width:480px;margin:0 auto;padding:0 1.25rem 5rem}
+    .header{padding:1.75rem 0 1.25rem;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo-mark{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center}
+    .logo-mark svg{width:18px;height:18px;fill:white}
+    .logo-name{font-family:'DM Serif Display',serif;font-size:22px}
+    .streak-chip{font-size:12px;color:var(--ink-soft);background:var(--warm);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
+    .screen{display:none}.screen.active{display:block;animation:fadeUp 0.28s ease}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px}
+    .greeting{margin-bottom:1.5rem}
+    .greeting h1{font-family:'DM Serif Display',serif;font-size:26px;line-height:1.25}
+    .greeting h1 em{font-style:italic;color:var(--accent)}
+    .greeting-context{font-size:14px;color:var(--ink-soft);background:var(--accent-lt);border-radius:8px;padding:10px 12px;margin-top:10px;line-height:1.5}
+    .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+    .stat{background:white;border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+    .stat-label{font-size:10px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
+    .stat-value{font-size:20px;font-weight:600}
+    .c-accent{color:var(--accent)}.c-success{color:var(--success)}
+    .insight-card{background:linear-gradient(135deg,#f0f2ff,#e8f7f0);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+    .insight-label{font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+    .insight-text{font-size:14px;color:var(--ink-soft);line-height:1.6}
+    .insight-text strong{color:var(--ink)}
+    .trend-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+    .trend-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .trend-title{font-size:12px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em}
+    .trend-summary{font-size:12px;color:var(--success);font-weight:500}
+    .bars{display:flex;align-items:flex-end;gap:5px;height:52px}
+    .bar{flex:1;border-radius:3px 3px 0 0;min-height:3px}
+    .bar-days{display:flex;justify-content:space-between;margin-top:5px}
+    .bar-days span{font-size:9px;color:var(--ink-muted)}
+    .progress-arc{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+    .arc-label{font-size:10px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px}
+    .arc-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .arc-week{font-size:11px;color:var(--ink-muted);width:60px;flex-shrink:0}
+    .arc-bar{flex:1;height:6px;background:var(--warm);border-radius:3px;overflow:hidden}
+    .arc-fill{height:100%;border-radius:3px}
+    .arc-score{font-size:12px;font-weight:500;color:var(--ink);width:28px;text-align:right;flex-shrink:0}
+    .goal-chip{display:inline-flex;align-items:center;gap:6px;background:var(--warm);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--ink-soft);margin-bottom:12px;cursor:pointer}
+    .cta-btn{display:block;width:100%;padding:15px;background:var(--accent);color:white;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;border:none;border-radius:var(--radius);cursor:pointer;margin-bottom:8px;transition:opacity 0.15s,transform 0.1s}
+    .cta-btn:hover{opacity:0.9;transform:translateY(-1px)}
+    .privacy-note{text-align:center;font-size:12px;color:var(--ink-muted)}
+    .back-btn{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink-muted);cursor:pointer;padding:0;margin-bottom:1.25rem;display:flex;align-items:center;gap:4px}
+    .progress-row{display:flex;gap:5px;margin-bottom:1.75rem}
+    .pip{height:3px;flex:1;border-radius:2px;background:var(--border);transition:background 0.3s}
+    .pip.done{background:var(--accent)}.pip.active{background:var(--accent);opacity:0.45}
+    .q-icon{font-size:28px;margin-bottom:12px}
+    .q-number{font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+    .q-text{font-family:'DM Serif Display',serif;font-size:21px;color:var(--ink);line-height:1.3;margin-bottom:6px}
+    .q-sub{font-size:13px;color:var(--ink-muted);margin-bottom:18px}
+    .q-memory{font-size:13px;color:var(--accent);background:var(--accent-lt);border-radius:8px;padding:8px 12px;margin-bottom:14px}
+    .options{display:flex;flex-direction:column;gap:8px}
+    .opt{display:flex;align-items:center;gap:12px;background:var(--paper);border:1.5px solid var(--border);border-radius:10px;padding:13px 14px;font-size:14px;color:var(--ink);cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:border-color 0.15s,background 0.15s}
+    .opt:hover{border-color:var(--accent);background:var(--accent-lt)}
+    .opt.selected{border-color:var(--accent);background:var(--accent-lt);color:var(--accent);font-weight:500}
+    .opt-emoji{font-size:18px;flex-shrink:0}
+    .next-btn{display:none;width:100%;padding:14px;background:var(--ink);color:white;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;border:none;border-radius:var(--radius);cursor:pointer;margin-top:10px}
+    .result-hero{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:12px}
+    .result-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+    .result-title{font-family:'DM Serif Display',serif;font-size:18px}
+    .badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.04em}
+    .badge-ok{background:var(--success-lt);color:var(--success)}
+    .badge-warn{background:var(--warn-lt);color:var(--warn)}
+    .badge-risk{background:var(--danger-lt);color:var(--danger)}
+    .score-row{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
+    .score-big{font-family:'DM Serif Display',serif;font-size:52px;line-height:1}
+    .score-denom{font-size:16px;color:var(--ink-muted)}
+    .score-trend{font-size:13px;margin-left:6px}
+    .t-down{color:var(--success)}.t-up{color:var(--danger)}
+    .risk-bar-wrap{height:6px;background:var(--warm);border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px}
+    .risk-fill{height:100%;border-radius:3px;transition:width 0.9s cubic-bezier(.4,0,.2,1)}
+    .bar-ends{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-muted);margin-bottom:14px}
+    .result-msg{font-size:14px;color:var(--ink-soft);line-height:1.65}
+    .named-signal{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;font-size:13px;color:var(--ink-soft);line-height:1.55}
+    .named-signal strong{color:var(--ink);display:block;margin-bottom:2px;font-size:12px;text-transform:uppercase;letter-spacing:0.04em}
+    .eyebrow{font-size:10px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.06em;margin:1.25rem 0 0.6rem}
+    .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+    .tag{font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px}
+    .tag-ok{background:var(--success-lt);color:var(--success)}
+    .tag-warn{background:var(--warn-lt);color:var(--warn)}
+    .tag-risk{background:var(--danger-lt);color:var(--danger)}
+    .action-item{display:flex;align-items:flex-start;gap:12px;background:white;border:1px solid var(--border);border-radius:10px;padding:13px 14px;margin-bottom:8px}
+    .action-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+    .action-text{font-size:13px;color:var(--ink-soft);line-height:1.55}
+    .affirmation{background:linear-gradient(135deg,var(--accent-lt),var(--success-lt));border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:4px;text-align:center}
+    .affirmation p{font-size:13px;color:var(--ink-soft);line-height:1.6}
+    .affirmation strong{color:var(--ink)}
+    .crisis-card{background:var(--danger-lt);border:1px solid rgba(201,64,64,0.2);border-radius:var(--radius);padding:16px;margin-top:8px;display:none}
+    .crisis-card strong{color:var(--danger);font-size:14px;display:block;margin-bottom:6px}
+    .crisis-card p{font-size:13px;color:var(--ink-soft);line-height:1.65}
+    .crisis-card a{color:var(--danger);font-weight:500}
+    .disclaimer{font-size:12px;color:var(--ink-muted);background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:10px;line-height:1.6}
+    .result-btns{display:flex;gap:8px;margin-top:1.25rem}
+    .btn-sec{flex:1;padding:12px;background:white;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,0.5);z-index:100;align-items:flex-end;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:white;border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:480px;animation:slideUp 0.3s ease}
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .modal-title{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:6px}
+    .modal-sub{font-size:14px;color:var(--ink-muted);margin-bottom:20px}
+    .goal-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .goal-opt{background:var(--paper);border:1.5px solid var(--border);border-radius:10px;padding:14px 12px;cursor:pointer;text-align:center;font-size:14px;color:var(--ink);transition:all 0.15s;font-family:'DM Sans',sans-serif}
+    .goal-opt:hover,.goal-opt.selected{border-color:var(--accent);background:var(--accent-lt);color:var(--accent);font-weight:500}
+    .goal-emoji{font-size:22px;display:block;margin-bottom:4px}
+    .modal-btn{display:block;width:100%;padding:14px;margin-top:16px;background:var(--accent);color:white;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;border:none;border-radius:var(--radius);cursor:pointer}
+    .hero{padding:1rem 0 1.5rem}
+    .hero-eye{font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px}
+    .hero h1{font-family:'DM Serif Display',serif;font-size:32px;line-height:1.2;margin-bottom:10px}
+    .hero h1 em{font-style:italic;color:var(--accent)}
+    .hero p{font-size:14px;color:var(--ink-soft);line-height:1.7;margin-bottom:20px}
+    .global-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+    .gstat{background:var(--warm);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+    .gstat-num{font-family:'DM Serif Display',serif;font-size:28px;color:var(--accent);margin-bottom:2px}
+    .gstat-label{font-size:12px;color:var(--ink-soft);line-height:1.4}
+    .step-list{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+    .step-title{font-size:11px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px}
+    .step{display:flex;gap:12px;margin-bottom:14px}
+    .step:last-child{margin-bottom:0}
+    .step-n{width:22px;height:22px;background:var(--accent-lt);color:var(--accent);border-radius:50%;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .step-body{font-size:14px;color:var(--ink-soft);line-height:1.5}
+    .step-body strong{color:var(--ink)}
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(250,249,247,0.94);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;max-width:480px;margin:0 auto}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 0 11px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;color:var(--ink-muted);transition:color 0.15s}
+    .nav-item.active{color:var(--accent)}
+    .nav-icon{font-size:19px;margin-bottom:2px}
+    .nav-label{font-size:10px;font-weight:500}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+      <span class="logo-name">Mitra</span>
+    </div>
+    <div class="streak-chip">🔥 <strong id="streak-num">8</strong> day streak</div>
+  </header>
+
+  <!-- ABOUT -->
+  <section class="screen active" id="s-about">
+    <div class="hero">
+      <div class="hero-eye">Agents for Good · Global Mental Health</div>
+      <h1>The friend who notices<br><em>before you do.</em></h1>
+      <p>Mitra (Sanskrit for "friend") tracks 4 daily behavioral signals and catches early warning patterns — before they become crises. Free, private, and designed for everyone on earth.</p>
+    </div>
+    <div class="global-stats">
+      <div class="gstat"><div class="gstat-num">1B+</div><div class="gstat-label">people with mental health conditions globally</div></div>
+      <div class="gstat"><div class="gstat-num">75%</div><div class="gstat-label">in low-income countries receive zero treatment</div></div>
+      <div class="gstat"><div class="gstat-num">30yr</div><div class="gstat-label">average delay between symptoms and getting help</div></div>
+      <div class="gstat"><div class="gstat-num">7.2d</div><div class="gstat-label">AI detects crisis signals before human experts do</div></div>
+    </div>
+    <div class="step-list">
+      <div class="step-title">How Mitra works</div>
+      <div class="step"><div class="step-n">1</div><div class="step-body"><strong>60-second daily check-in.</strong> Four questions about sleep, energy, social connection, and mood.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-body"><strong>7-day signal intelligence.</strong> Mitra scores patterns across the week — not just today.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-body"><strong>Early warning.</strong> When patterns shift, Mitra notices and gives you one specific action before crisis hits.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-body"><strong>Safe escalation.</strong> High-risk signals surface real crisis resources in your language — only with your consent.</div></div>
+    </div>
+    <button class="cta-btn" style="margin-top:1rem" onclick="nav('s-home')">Try Mitra →</button>
+  </section>
+
+  <!-- HOME -->
+  <section class="screen" id="s-home">
+    <div class="greeting">
+      <div style="font-size:12px;color:var(--ink-muted);margin-bottom:6px" id="home-date">Friday, July 4</div>
+      <h1 id="home-greeting">Good morning.<br><em>Yesterday felt tough.</em></h1>
+      <div class="greeting-context">Mitra noticed you had low energy for 3 days in a row last week. Let's see how today compares.</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Streak</div><div class="stat-value c-accent">8d 🔥</div></div>
+      <div class="stat"><div class="stat-label">Avg score</div><div class="stat-value">34</div></div>
+      <div class="stat"><div class="stat-label">Trend</div><div class="stat-value c-success">↓ 19</div></div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-label">✦ Weekly insight</div>
+      <div class="insight-text">Two weeks ago your average risk score was <strong>68</strong>. This week it's <strong>34</strong>. That's real, meaningful progress — keep showing up.</div>
+    </div>
+    <div class="trend-card">
+      <div class="trend-header"><div class="trend-title">7-day risk pattern</div><div class="trend-summary">↓ Improving</div></div>
+      <div class="bars" id="bars"></div>
+      <div class="bar-days"><span>7d ago</span><span>Today</span></div>
+    </div>
+    <div class="progress-arc">
+      <div class="arc-label">Progress arc</div>
+      <div class="arc-row"><div class="arc-week">2 wks ago</div><div class="arc-bar"><div class="arc-fill" style="width:68%;background:var(--danger)"></div></div><div class="arc-score">68</div></div>
+      <div class="arc-row"><div class="arc-week">Last week</div><div class="arc-bar"><div class="arc-fill" style="width:48%;background:var(--warn)"></div></div><div class="arc-score">48</div></div>
+      <div class="arc-row"><div class="arc-week">This week</div><div class="arc-bar"><div class="arc-fill" style="width:34%;background:var(--success)"></div></div><div class="arc-score">34</div></div>
+    </div>
+    <div class="goal-chip" onclick="openGoal()">🎯 <span id="goal-display">Set your goal</span> ›</div>
+    <button class="cta-btn" onclick="startCheckin()">Start today's check-in</button>
+    <p class="privacy-note">60 seconds · Private · Never stored externally</p>
+  </section>
+
+  <!-- Q1 -->
+  <section class="screen" id="s-q1">
+    <button class="back-btn" onclick="nav('s-home')">← Back</button>
+    <div class="progress-row"><div class="pip active"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div></div>
+    <div class="card">
+      <div class="q-icon">🌙</div>
+      <div class="q-number">Question 1 of 4</div>
+      <div class="q-text">How did you sleep last night?</div>
+      <div class="q-sub">Sleep is the first signal Mitra tracks</div>
+      <div class="options">
+        <button class="opt" onclick="pick(this,'sleep','poor')"><span class="opt-emoji">😔</span>Poorly — under 5 hours or kept waking</button>
+        <button class="opt" onclick="pick(this,'sleep','fair')"><span class="opt-emoji">😐</span>Okay — slept but didn't feel rested</button>
+        <button class="opt" onclick="pick(this,'sleep','good')"><span class="opt-emoji">😊</span>Well — felt genuinely rested</button>
+      </div>
+    </div>
+    <button class="next-btn" id="n-q1" onclick="nav('s-q2')">Next →</button>
+  </section>
+
+  <!-- Q2 -->
+  <section class="screen" id="s-q2">
+    <button class="back-btn" onclick="nav('s-q1')">← Back</button>
+    <div class="progress-row"><div class="pip done"></div><div class="pip active"></div><div class="pip"></div><div class="pip"></div></div>
+    <div class="card">
+      <div class="q-icon">⚡</div>
+      <div class="q-number">Question 2 of 4</div>
+      <div class="q-text">How is your energy and motivation today?</div>
+      <div class="q-sub">Low energy sustained over days is an early warning signal</div>
+      <div class="q-memory">Mitra noticed: you reported low energy 3 days this week. Today's answer will update your pattern.</div>
+      <div class="options">
+        <button class="opt" onclick="pick(this,'energy','low')"><span class="opt-emoji">🪫</span>Very low — hard to start anything</button>
+        <button class="opt" onclick="pick(this,'energy','fair')"><span class="opt-emoji">⚡</span>Mixed — okay for some things</button>
+        <button class="opt" onclick="pick(this,'energy','high')"><span class="opt-emoji">🔋</span>Good — feeling motivated</button>
+      </div>
+    </div>
+    <button class="next-btn" id="n-q2" onclick="nav('s-q3')">Next →</button>
+  </section>
+
+  <!-- Q3 -->
+  <section class="screen" id="s-q3">
+    <button class="back-btn" onclick="nav('s-q2')">← Back</button>
+    <div class="progress-row"><div class="pip done"></div><div class="pip done"></div><div class="pip active"></div><div class="pip"></div></div>
+    <div class="card">
+      <div class="q-icon">🤝</div>
+      <div class="q-number">Question 3 of 4</div>
+      <div class="q-text">Have you connected with anyone meaningful in the last 48 hours?</div>
+      <div class="q-sub">Social withdrawal is the strongest predictor of crisis escalation</div>
+      <div class="options">
+        <button class="opt" onclick="pick(this,'social','no')"><span class="opt-emoji">🚪</span>No — keeping to myself</button>
+        <button class="opt" onclick="pick(this,'social','brief')"><span class="opt-emoji">👋</span>Briefly — nothing meaningful</button>
+        <button class="opt" onclick="pick(this,'social','yes')"><span class="opt-emoji">💬</span>Yes — had a real conversation</button>
+      </div>
+    </div>
+    <button class="next-btn" id="n-q3" onclick="nav('s-q4')">Next →</button>
+  </section>
+
+  <!-- Q4 -->
+  <section class="screen" id="s-q4">
+    <button class="back-btn" onclick="nav('s-q3')">← Back</button>
+    <div class="progress-row"><div class="pip done"></div><div class="pip done"></div><div class="pip done"></div><div class="pip active"></div></div>
+    <div class="card">
+      <div class="q-icon">🙂</div>
+      <div class="q-number">Question 4 of 4 — last one</div>
+      <div class="q-text">How would you describe your overall mood right now?</div>
+      <div class="q-sub">Your honest answer is what helps Mitra notice what matters</div>
+      <div class="options">
+        <button class="opt" onclick="pick(this,'mood','low')"><span class="opt-emoji">😞</span>Low — anxious, sad, or empty</button>
+        <button class="opt" onclick="pick(this,'mood','neutral')"><span class="opt-emoji">😶</span>Neutral — not great, not bad</button>
+        <button class="opt" onclick="pick(this,'mood','good')"><span class="opt-emoji">🙂</span>Good — relatively positive</button>
+      </div>
+    </div>
+    <button class="next-btn" id="n-q4" onclick="nav('s-reflect')">Almost done →</button>
+  </section>
+
+  <!-- REFLECT -->
+  <section class="screen" id="s-reflect">
+    <button class="back-btn" onclick="nav('s-q4')">← Back</button>
+    <div class="card">
+      <div class="q-icon">💭</div>
+      <div class="q-text">Anything on your mind today?</div>
+      <div class="q-sub">Optional — this helps Mitra understand your context. Never stored.</div>
+      <textarea style="width:100%;min-height:80px;resize:none;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);border:1.5px solid var(--border);border-radius:10px;padding:12px;background:var(--paper);outline:none;line-height:1.6" placeholder="e.g. Work has been stressful this week..."></textarea>
+    </div>
+    <button class="cta-btn" onclick="showResult()">See my signal →</button>
+    <div style="font-size:12px;color:var(--ink-muted);text-align:center;margin-top:8px;cursor:pointer" onclick="showResult()">Skip this step</div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="s-result">
+    <div class="result-hero">
+      <div class="result-header"><div class="result-title">Your signal today</div><span class="badge" id="r-badge"></span></div>
+      <div class="score-row"><div class="score-big" id="r-score">0</div><div class="score-denom">/100</div><div class="score-trend" id="r-trend"></div></div>
+      <div class="risk-bar-wrap"><div class="risk-fill" id="r-fill" style="width:0%"></div></div>
+      <div class="bar-ends"><span>Low risk</span><span>High risk</span></div>
+      <div class="result-msg" id="r-msg"></div>
+    </div>
+    <div class="eyebrow">What Mitra noticed</div>
+    <div id="r-named"></div>
+    <div class="eyebrow">Signal tags</div>
+    <div class="tags" id="r-tags"></div>
+    <div class="eyebrow">One thing to do today</div>
+    <div id="r-actions"></div>
+    <div class="affirmation" id="r-affirmation"></div>
+    <div class="crisis-card" id="r-crisis">
+      <strong>If you're in crisis right now</strong>
+      <p>🇺🇸 US: Call or text <strong>988</strong><br>🇮🇳 India: <strong>9152987821</strong> (iCall)<br>🇬🇧 UK: <strong>116 123</strong> (Samaritans)<br>🌍 Global: <a href="https://www.iasp.info/resources/Crisis_Centres/" target="_blank">Find your local crisis center →</a></p>
+    </div>
+    <div class="disclaimer">ℹ️ Mitra is an awareness tool, not a clinical service. This is not medical advice. Please consult a qualified professional for clinical mental health support.</div>
+    <div class="result-btns">
+      <button class="btn-sec" onclick="nav('s-home')">← Home</button>
+      <button class="btn-sec" onclick="resetCheckin()">Check in again</button>
+    </div>
+  </section>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-item" onclick="nav('s-about')" id="nav-about"><div class="nav-icon">✦</div><div class="nav-label">About</div></button>
+  <button class="nav-item active" onclick="nav('s-home')" id="nav-home"><div class="nav-icon">◎</div><div class="nav-label">Check-in</div></button>
+  <button class="nav-item" onclick="nav('s-result')" id="nav-signal"><div class="nav-icon">◈</div><div class="nav-label">Signal</div></button>
+</nav>
+
+<div class="modal-overlay" id="goal-modal" onclick="closeGoal(event)">
+  <div class="modal">
+    <div class="modal-title">What's your focus?</div>
+    <div class="modal-sub">Mitra will weight recommendations toward your goal.</div>
+    <div class="goal-opts">
+      <button class="goal-opt" onclick="setGoal(this,'Sleep better')"><span class="goal-emoji">🌙</span>Sleep better</button>
+      <button class="goal-opt" onclick="setGoal(this,'Reduce stress')"><span class="goal-emoji">🧘</span>Reduce stress</button>
+      <button class="goal-opt" onclick="setGoal(this,'Stay connected')"><span class="goal-emoji">💬</span>Stay connected</button>
+      <button class="goal-opt" onclick="setGoal(this,'Build energy')"><span class="goal-emoji">⚡</span>Build energy</button>
+    </div>
+    <button class="modal-btn" onclick="closeGoal()">Set my goal</button>
+  </div>
+</div>
+
+<script>
+const W={sleep:{poor:30,fair:15,good:0},energy:{low:25,fair:10,high:0},social:{no:25,brief:12,yes:0},mood:{low:20,neutral:8,good:0}};
+const TREND=[68,60,52,44,38,35,34];
+const answers={};
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const d=new Date();
+  document.getElementById('home-date').textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const h=d.getHours();
+  document.getElementById('home-greeting').innerHTML=`Good ${h<12?'morning':h<17?'afternoon':'evening'}.<br><em>Yesterday felt tough.</em>`;
+  const c=document.getElementById('bars');
+  const colors=['#c94040','#c94040','#d97d2a','#d97d2a','#2d9e6b','#2d9e6b','#2d9e6b'];
+  TREND.forEach((v,i)=>{const b=document.createElement('div');b.className='bar';b.style.cssText=`height:${v*0.65}px;background:${colors[i]};opacity:${i===6?1:0.55}`;c.appendChild(b);});
+});
+
+function nav(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(id==='s-about')document.getElementById('nav-about').classList.add('active');
+  if(id==='s-home')document.getElementById('nav-home').classList.add('active');
+  if(id==='s-result')document.getElementById('nav-signal').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function startCheckin(){
+  document.querySelectorAll('.opt').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.next-btn').forEach(b=>b.style.display='none');
+  nav('s-q1');
+}
+
+function pick(btn,sig,val){
+  btn.closest('.card').querySelectorAll('.opt').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  answers[sig]=val;
+  const nb=document.getElementById('n-'+btn.closest('.screen').id.replace('s-',''));
+  if(nb)nb.style.display='block';
+}
+
+function score(){let s=0;for(const k in W)if(answers[k])s+=W[k][answers[k]]||0;return Math.min(s,100);}
+
+function showResult(){
+  const s=score();
+  nav('s-result');
+  const numEl=document.getElementById('r-score');
+  const fill=document.getElementById('r-fill');
+  const badge=document.getElementById('r-badge');
+  const msg=document.getElementById('r-msg');
+  const trend=document.getElementById('r-trend');
+  const named=document.getElementById('r-named');
+  const tags=document.getElementById('r-tags');
+  const acts=document.getElementById('r-actions');
+  const aff=document.getElementById('r-affirmation');
+  const crisis=document.getElementById('r-crisis');
+  let c=0;const iv=setInterval(()=>{c+=2;if(c>=s){c=s;clearInterval(iv);}numEl.textContent=c;},18);
+  setTimeout(()=>{fill.style.width=s+'%';},80);
+  const diff=s-48;
+  trend.textContent=diff<0?`↓ ${Math.abs(diff)} vs yesterday`:diff>0?`↑ ${diff} vs yesterday`:'→ same as yesterday';
+  trend.className='score-trend '+(diff<0?'t-down':diff>0?'t-up':'');
+  let level,fc;
+  if(s<=25){level='low';fc='#2d9e6b';badge.textContent='Low risk';badge.className='badge badge-ok';msg.textContent='Your signals look healthy today. Maintaining consistent routines is one of the most protective things you can do for your mental health.';crisis.style.display='none';}
+  else if(s<=55){level='watch';fc='#d97d2a';badge.textContent='Watch closely';badge.className='badge badge-warn';msg.textContent='Some early signals detected. These patterns — if sustained over several days — are worth paying attention to. Small actions today matter more than you think.';crisis.style.display='none';}
+  else{level='high';fc='#c94040';badge.textContent='Act today';badge.className='badge badge-risk';msg.textContent='Multiple warning signals detected. This pattern is consistent with early disengagement. Please take at least one action today — even a small one counts.';crisis.style.display='block';}
+  fill.style.background=fc;
+  const namedMap={
+    sleep:{poor:['🌙 Sleep',"You haven't been sleeping well. This is often the first sign the body sends before things get harder."],fair:['🌙 Sleep',"Your sleep was disrupted. A consistent wind-down routine builds over time."],good:null},
+    energy:{low:['⚡ Energy',"Mitra noticed: you reported low energy 3 days this week. This pattern is worth watching."],fair:['⚡ Energy',"Your energy is mixed today. The question is whether the pattern holds over the week."],high:null},
+    social:{no:['🤝 Connection',"You haven't talked to anyone meaningful in 48 hours. One message changes this."],brief:['🤝 Connection',"A brief connection, but nothing meaningful. Even a short honest conversation shifts the pattern."],yes:null},
+    mood:{low:['🙂 Mood',"You're feeling low today. Mitra sees this. It's worth naming, and worth taking one small action."],neutral:['🙂 Mood',"Neutral today. Sometimes that's the precursor to a slide — watch what your sleep and energy are doing."],good:null}
+  };
+  named.innerHTML='';
+  for(const k in namedMap){if(answers[k]&&namedMap[k][answers[k]]){const[label,text]=namedMap[k][answers[k]];named.innerHTML+=`<div class="named-signal"><strong>${label}</strong>${text}</div>`;}}
+  if(!named.innerHTML)named.innerHTML='<div class="named-signal"><strong>✓ All signals clear</strong>Your patterns look consistently healthy today.</div>';
+  const tagMap={sleep:{poor:['Poor sleep','risk'],fair:['Disrupted sleep','warn'],good:['Good sleep','ok']},energy:{low:['Low energy','risk'],fair:['Variable energy','warn'],high:['Good energy','ok']},social:{no:['Social withdrawal','risk'],brief:['Limited connection','warn'],yes:['Connected','ok']},mood:{low:['Low mood','risk'],neutral:['Neutral mood','warn'],good:['Positive mood','ok']}};
+  tags.innerHTML='';
+  for(const k in tagMap){if(answers[k]){const[lbl,type]=tagMap[k][answers[k]];tags.innerHTML+=`<span class="tag tag-${type}">${lbl}</span>`;}}
+  const recs=[];
+  if(answers.sleep==='poor'||answers.sleep==='fair')recs.push(['🌙','Wind down 30 min before bed — no screens. Even one better night shifts your weekly average.']);
+  if(answers.energy==='low')recs.push(['🚶','A 5-minute walk outside resets energy faster than rest. Start there.']);
+  if(answers.social==='no')recs.push(['💬','Send one message to someone you trust today. Just reaching out is enough.']);
+  if(answers.mood==='low')recs.push(['📝','Write 3 things you noticed today — not grateful for, just noticed.']);
+  if(recs.length===0)recs.push(['✓','Your patterns look strong. The best thing you can do is keep showing up tomorrow.']);
+  if(level==='high')recs.push(['❤️','Consider reaching out to someone you trust today. You don\'t have to explain everything.']);
+  acts.innerHTML='';
+  recs.forEach(([icon,text])=>{acts.innerHTML+=`<div class="action-item"><div class="action-icon">${icon}</div><div class="action-text">${text}</div></div>`;});
+  const streakNum=parseInt(document.getElementById('streak-num').textContent)+1;
+  document.getElementById('streak-num').textContent=streakNum;
+  aff.innerHTML=level==='low'?`<p>🔥 <strong>Day ${streakNum} of showing up for yourself.</strong><br>Research shows 21 days of consistent check-ins builds a protective habit.</p>`:level==='watch'?`<p>🔥 <strong>${streakNum} days in a row.</strong><br>Even on tough days, checking in is the right thing. Mitra will be here tomorrow.</p>`:`<p><strong>Mitra sees you.</strong><br>Checking in on a hard day takes courage. Whatever you do today — one small step is enough.</p>`;
+}
+
+function resetCheckin(){Object.keys(answers).forEach(k=>delete answers[k]);startCheckin();}
+function openGoal(){document.getElementById('goal-modal').classList.add('open');}
+function closeGoal(e){if(!e||e.target===document.getElementById('goal-modal'))document.getElementById('goal-modal').classList.remove('open');}
+function setGoal(btn,goal){document.querySelectorAll('.goal-opt').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');document.getElementById('goal-display').textContent=goal;}
+</script>
+</body>
+</html>
